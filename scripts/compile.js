@@ -50,6 +50,12 @@ module.exports.compileTheme = () => {
 		if (fs.existsSync('./src/img')) {
 			shell.cp('-r', `./src/img`, `${DIST}/${theme}/_assets`)
 		}
+		if (fs.existsSync('./gulpfile.js')) {
+			shell.cp('-r', `./gulpfile.js`, `${DIST}/${theme}/_assets`)
+		}
+		if (fs.existsSync('./package.json')) {
+			shell.cp('-r', `./package.json`, `${DIST}/${theme}/_assets`)
+		}
 		// Rename stylesheet to style.css
 		shell.mv(`${DIST}/${theme}/_assets/css/${theme}-style.css`, `${DIST}/${theme}/_assets/css/style.css`)
 		// Rename info file to netothemeinfo.txt
