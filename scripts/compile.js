@@ -41,9 +41,15 @@ module.exports.compileTheme = () => {
 		// Copy templates
 		shell.cp('-r', `./src/templates/.`, `${DIST}/${theme}/`)
 		// Copy assets
-		shell.cp('-r', `./src/css`, `${DIST}/${theme}/_assets`)
-		shell.cp('-r', `./src/js`, `${DIST}/${theme}/_assets`)
-		shell.cp('-r', `./src/img`, `${DIST}/${theme}/_assets`)
+		if (fs.existsSync('./src/css')) {
+			shell.cp('-r', `./src/css`, `${DIST}/${theme}/_assets`)
+		}
+		if (fs.existsSync('./src/js')) {
+			shell.cp('-r', `./src/js`, `${DIST}/${theme}/_assets`)
+		}
+		if (fs.existsSync('./src/img')) {
+			shell.cp('-r', `./src/img`, `${DIST}/${theme}/_assets`)
+		}
 		// Rename stylesheet to style.css
 		shell.mv(`${DIST}/${theme}/_assets/css/${theme}-style.css`, `${DIST}/${theme}/_assets/css/style.css`)
 		// Rename info file to netothemeinfo.txt

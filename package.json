@@ -1,6 +1,6 @@
 {
   "name": "ntheme",
-  "version": "1.4.7",
+  "version": "1.4.8",
   "description": "Set up a new environment for you to build a Neto theme!",
   "main": "index.js",
   "scripts": {
