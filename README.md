@@ -1,12 +1,9 @@
 ```
 npm install -g ntheme
 ```
+ntheme lets you generate and compile a Neto theme!
 
 ![](http://design.neto.com.au/assets/uploads/QR0D5N9y3D.png)
-
-This repo contains a node module, `ntheme`, which will set up a new environment for you to build a Neto theme!
-
-It also acts as a repository for themeScripts which are used within the themes to compile, update and upload stuff. You shouldn't run these scripts within this repository—they are just here for version control and storage.
 
 ## Commands
 
@@ -17,7 +14,7 @@ It also acts as a repository for themeScripts which are used within the themes t
 
 Note that you need [Node.js](https://nodejs.org/en/) installed, and [gulp.js](http://gulpjs.com/) installed globally to run this script successfully.
 
-## How to build a theme
+## Generate a theme
 
 Create your **Themes** directory and `cd` into the directory:
 
@@ -25,9 +22,7 @@ Create your **Themes** directory and `cd` into the directory:
 cd Themes
 ```
 
-### Generate your theme
-
-We are now ready to generate our first theme. To do this we simply need to run the generate command:
+Now simply run the following command:
 
 ```
 ntheme generate themeName
@@ -35,11 +30,40 @@ ntheme generate themeName
 
 **Note: You would replace `themeName` with the name of your new theme.**
 
-### Set up git
+## Compile a theme
+
+For a theme to be published to the Neto theme store, it has to be compiled in a certain way which this module takes care of. In order for the compile script to work correctly, your theme will need:
+
+### Neto theme info
+
+Either your theme can have a `THEME_NAME-netohemeinfo.txt` file which is in the templates directory:
+
+```
+mythemename
+└── src
+    └── templates
+        └── THEME_NAME-netohemeinfo.txt
+```
+
+You can follow the Skeletal file as a template:
+
+- https://github.com/NetoECommerce/Skeletal/blob/master/src/templates/skeletal-netothemeinfo.txt
+
+Or if you do not want to include this file, you can adjust your `package.json` to include a `theme_names` array of theme names. In most cases you will just have the one theme, so it would be:
+
+```
+"theme_names": [ "THEME_NAME" ]
+```
+
+### Stylesheet
+
+Ensure you have a stylesheet in `./css` called `THEME_NAME-style.css`. This file should contain all your theme editor styles.
+
+## Set up git
 
 Now, you just need to set up git. If you're not experienced with git, We recommend you install [GitHub Desktop](https://desktop.github.com/) and [set up the repository using the app](http://design.neto.com.au/assets/uploads/E9FX9Dej3d.gif).
 
-### Customising templates
+## Customising templates
 
 It's important to know that your themes repository should only contain the templates which are different to the templates on Skeletal. This is why your new theme only contains the header, footer and homepage by default:
 
@@ -82,4 +106,4 @@ cd themeName
 gulp
 ```
 
-This will prompt gulp to watch any changes you make to `src/css/app.less` and automatically compile them.
+This will prompt gulp to watch any changes you make to `src/css/app.less` and automatically compile them. You can add in new build task in the `gulpfile.js`.
