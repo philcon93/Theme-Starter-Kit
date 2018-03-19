@@ -2,10 +2,12 @@
 
 const fs = require('fs')
 const shell = require('shelljs')
+const zipFolder = require('./zipFolder')
 const chalk = require('chalk')
 const log = console.log
 const success = chalk.green
 const warning = chalk.yellow
+const error = chalk.red
 
 module.exports.compileTheme = () => {
 	// Folder where everything will be compiled to
@@ -69,8 +71,8 @@ module.exports.compileTheme = () => {
 
 	fs.readdirSync('./').forEach(themeFolder => {
 		// Zip each folder
-		shell.exec(`zip -rq ${themeFolder}.zip ${themeFolder}`)
-		shell.rm('-rf', themeFolder);
+		zipFolder(themeFolder, () => { log(success(`Compressed ${themeFolder}`))})
+		shell.rm('-rf', themeFolder)
 	})
 
 	shell.cd("../")
