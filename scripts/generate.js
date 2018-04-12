@@ -12,6 +12,7 @@ module.exports.generateTheme = (name) => {
 		var DEST = `./${name}`
 	}else{
 		var DEST = './newTheme'
+		var name = 'theme'
 	}
 	var TEMP = './temp'
 
@@ -51,6 +52,7 @@ module.exports.generateTheme = (name) => {
 	shell.cp('-r', `${TEMP}/.latestSkeletal/src/templates/headers/template.html`,`${DEST}/src/templates/headers/`)
 	shell.cp('-r', `${TEMP}/.latestSkeletal/src/templates/footers/template.html`,`${DEST}/src/templates/footers/`)
 	shell.cp('-r', `${TEMP}/.latestSkeletal/src/templates/cms/home.template.html`,`${DEST}/src/templates/cms/`)
+	shell.cp('-r', `${TEMP}/.latestSkeletal/src/templates/skeletal-netothemeinfo.txt`,`${DEST}/src/templates/${name}-netothemeinfo.txt`)
 	// Copy in less
 	shell.cp('-r', `${TEMP}/.latestSkeletal/src/css/less/_custom.less`,`${DEST}/src/css/less/`)
 	shell.cp('-r', `${TEMP}/.latestSkeletal/src/css/less/_neto.less`,`${DEST}/src/css/less/`)
