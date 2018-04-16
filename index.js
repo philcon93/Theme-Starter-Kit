@@ -9,10 +9,11 @@ program
 	.version(pkg.version)
 
 program
-	.command('generate <name>')
+	.command('generate <themeName>')
+	.option('-b, --branch <branchName>', 'Branch name or release tag')
 	.description('Create a new Neto theme')
-	.action(function (name){
-		generateTheme(name)
+	.action(function (themeName, options){
+		generateTheme(themeName, options.branch)
 	});
 
 program

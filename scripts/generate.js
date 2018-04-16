@@ -6,7 +6,7 @@ const log = console.log
 const success = chalk.green
 const warning = chalk.yellow
 
-module.exports.generateTheme = (name) => {
+module.exports.generateTheme = (name, branch) => {
 	// Folder where everything will be compiled to
 	if(name){
 		var DEST = `./${name}`
@@ -30,9 +30,25 @@ module.exports.generateTheme = (name) => {
 
 	log(warning("Building a new theme"))
 	log(warning("Cloning the latest version of Skeletal from GitHub."))
-	shell.exec(`git clone --depth 1 https://github.com/NetoECommerce/Skeletal.git ${TEMP}/.latestSkeletal`)
+	if(branch !== undefined){
+		shell.exec(`git clone -b "${branch}" --depth 1 https://github.com/NetoECommerce/Skeletal.git ${TEMP}/.latestSkeletal`)
+	}else{
+		shell.exec(`git clone --depth 1 https://github.com/NetoECommerce/Skeletal.git ${TEMP}/.latestSkeletal`)
+	}
 	log(success("👍 Skeletal cloned!"))
 
+	makeDir(DEST, function(){
+		cpFiles(TEMP, DEST, name, function(){
+			installModules(DEST, function(){
+				log(success(`Your new theme is located at ${DEST}. You can go there in terminal with the command cd ${DEST}`))
+				log(success("Congratulations! You can now start working on your new theme."))
+				shell.exit(1)
+			})
+		})
+	})
+}
+
+function makeDir(DEST, callback){
 	log(warning("Creating the required directories."))
 	// Create directories for templates
 	shell.mkdir('-p', `${DEST}/src`)
@@ -46,7 +62,9 @@ module.exports.generateTheme = (name) => {
 	// Create Buildkite directory
 	shell.mkdir('-p', `${DEST}/.buildkite`)
 	log(success("👍 Directories created!"))
-
+	callback()
+}
+function cpFiles(TEMP, DEST, name, callback){
 	log(warning("Copying the required files from Skeletal to our new theme."))
 	// Copy in some standard templates from Skeletal
 	shell.cp('-r', `${TEMP}/.latestSkeletal/src/templates/headers/template.html`,`${DEST}/src/templates/headers/`)
@@ -69,18 +87,16 @@ module.exports.generateTheme = (name) => {
 	shell.cp('-r', `${TEMP}/.latestSkeletal/README.md`,`${DEST}/`)
 	// Copy buildkite
 	shell.cp('-r', `${TEMP}/.latestSkeletal/.buildkite/.`,`${DEST}/.buildkite/`)
-
+	log(success("👍 Copying done!"))
 	// Remove temp folder
 	shell.rm('-rf', TEMP)
-	log(success("👍 Copying done!"))
-
+	callback()
+}
+function installModules(DEST, callback){
 	log(warning("Installing all of the NPM dependecies."))
 	// Setup NPM
 	shell.cd(`${DEST}`)
 	shell.exec('npm install')
-
 	log(success("👍👍👍 Modules installed!"))
-	log(success(`Your new theme is located at ${DEST}. You can go there in terminal with the command cd ${DEST}`))
-	log(success("Congratulations! You can now start working on your new theme."))
-	shell.exit(1)
+	callback()
 }
