@@ -19,9 +19,10 @@ program
 program
 	.command('compile')
 	.option('-b, --branch <branchName>', 'Branch name or release tag')
+	.option('-m, --master', 'Compiles a master theme')
 	.description('Compiles a Neto theme')
 	.action(function (options){
-		compileTheme(options.branch)
+		compileTheme(options)
 	});
 
 program.parse(process.argv);
