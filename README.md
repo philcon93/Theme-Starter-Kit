@@ -8,8 +8,8 @@ ntheme lets you generate and compile a Neto theme!
 ## Commands
 
 ```
-- generate <name>  Create a new Neto theme
-- compile          Compiles a Neto theme
+- generate [options] <themeName>  Create a new Neto theme
+- compile [options]          Compiles a Neto theme
 ```
 
 Note that you need [Node.js](https://nodejs.org/en/) installed, and [gulp.js](http://gulpjs.com/) installed globally to run this script successfully.
@@ -29,6 +29,18 @@ ntheme generate themeName
 ```
 
 **Note: You would replace `themeName` with the name of your new theme.**
+
+### Options
+
+**-b 'branch'**
+
+Instead of generating your theme off the Master branch of Skeletal, you can target a branch or release tag. E.g if you wanted to use the Bootstrap4 branch, you could generate your theme like the following:
+
+```
+ntheme generate themeName -b "feature/b4"
+```
+
+**Note: When you compile your theme you will want to also target this branch/tag.**
 
 ## Compile a theme
 
@@ -58,6 +70,18 @@ Or if you do not want to include this file, you can adjust your `package.json` t
 ### Stylesheet
 
 Ensure you have a stylesheet in `./css` called `THEME_NAME-style.css`. This file should contain all your theme editor styles.
+
+### Options
+
+**-b 'branch'**
+
+Instead of compiling your theme off the Master branch of Skeletal, you can target a branch or release tag. E.g if you generated your theme with the Bootstrap4 branch, you would compile with the following command:
+
+```
+ntheme compile -b "feature/b4"
+```
+
+**Note: When you compile your theme you will have wanted to generated your theme with this branch/tag.** 
 
 ## Set up git
 

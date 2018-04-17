@@ -18,9 +18,10 @@ program
 
 program
 	.command('compile')
+	.option('-b, --branch <branchName>', 'Branch name or release tag')
 	.description('Compiles a Neto theme')
-	.action(function (){
-		compileTheme()
+	.action(function (options){
+		compileTheme(options.branch)
 	});
 
 program.parse(process.argv);
