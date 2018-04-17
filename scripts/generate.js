@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+const fs = require('fs')
 const shell = require('shelljs')
 const chalk = require('chalk')
 const log = console.log
@@ -8,19 +9,26 @@ const warning = chalk.yellow
 
 module.exports.generateTheme = (name, branch) => {
 	// Folder where everything will be compiled to
+	var options = {}
 	if(name){
-		var DEST = `./${name}`
+		options.dest = `./${name}`
+		options.name = name
 	}else{
-		var DEST = './newTheme'
-		var name = 'theme'
+		options.dest = './newTheme'
+		options.name = 'theme'
 	}
-	var TEMP = './temp'
+	if(branch !== undefined){
+		options.branch = branch
+	}else{
+		options.branch = undefined
+	}
+	options.temp = './temp'
 
 	// Remove dist and temp directories
-	shell.rm('-rf', DEST)
-	shell.mkdir('-p', DEST)
-	shell.rm('-rf', TEMP)
-	shell.mkdir('-p', TEMP)
+	shell.rm('-rf', options.dest)
+	shell.mkdir('-p', options.dest)
+	shell.rm('-rf', options.temp)
+	shell.mkdir('-p', options.temp)
 
 	// Determine the theme list dynamically
 	shell.cd('./')
@@ -29,18 +37,19 @@ module.exports.generateTheme = (name, branch) => {
 	log(success("This script will setup a new theme repository for you so you can start working on a new website."))
 
 	log(warning("Building a new theme"))
-	log(warning("Cloning the latest version of Skeletal from GitHub."))
-	if(branch !== undefined){
-		shell.exec(`git clone -b "${branch}" --depth 1 https://github.com/NetoECommerce/Skeletal.git ${TEMP}/.latestSkeletal`)
+	if(options.branch !== undefined){
+		log(warning(`Cloning version ${options.branch} of Skeletal.`))
+		shell.exec(`git clone -b "${options.branch}" --depth 1 https://github.com/NetoECommerce/Skeletal.git ${options.temp}/.latestSkeletal`)
 	}else{
-		shell.exec(`git clone --depth 1 https://github.com/NetoECommerce/Skeletal.git ${TEMP}/.latestSkeletal`)
+		log(warning("No branch/tag defined, cloning latest version of Skeletal."))
+		shell.exec(`git clone --depth 1 https://github.com/NetoECommerce/Skeletal.git ${options.temp}/.latestSkeletal`)
 	}
 	log(success("👍 Skeletal cloned!"))
 
-	makeDir(DEST, function(){
-		cpFiles(TEMP, DEST, name, function(){
-			installModules(DEST, function(){
-				log(success(`Your new theme is located at ${DEST}. You can go there in terminal with the command cd ${DEST}`))
+	makeDir(options, function(){
+		cpFiles(options, function(){
+			installModules(options, function(){
+				log(success(`Your new theme is located at ${options.dest}. You can go there in terminal with the command cd ${options.dest}`))
 				log(success("Congratulations! You can now start working on your new theme."))
 				shell.exit(1)
 			})
@@ -48,54 +57,66 @@ module.exports.generateTheme = (name, branch) => {
 	})
 }
 
-function makeDir(DEST, callback){
+function makeDir(options, callback){
 	log(warning("Creating the required directories."))
 	// Create directories for templates
-	shell.mkdir('-p', `${DEST}/src`)
-	shell.mkdir('-p', `${DEST}/src/templates`)
-	shell.mkdir('-p', `${DEST}/src/templates/headers`)
-	shell.mkdir('-p', `${DEST}/src/templates/cms`)
-	shell.mkdir('-p', `${DEST}/src/templates/footers`)
+	shell.mkdir('-p', `${options.dest}/src`)
+	shell.mkdir('-p', `${options.dest}/src/templates`)
+	shell.mkdir('-p', `${options.dest}/src/templates/headers`)
+	shell.mkdir('-p', `${options.dest}/src/templates/cms`)
+	shell.mkdir('-p', `${options.dest}/src/templates/footers`)
 	// Create directories for assets
-	shell.mkdir('-p', `${DEST}/src/css`)
-	shell.mkdir('-p', `${DEST}/src/css/less`)
+	shell.mkdir('-p', `${options.dest}/src/css`)
+	if (fs.existsSync(`${options.temp}/.latestSkeletal/src/css/less`)) {
+		shell.mkdir('-p', `${options.dest}/src/css/less`)
+	}else if (fs.existsSync(`${options.temp}/.latestSkeletal/src/scss`)) {
+		shell.mkdir('-p', `${options.dest}/src/scss`)
+	}
 	// Create Buildkite directory
-	shell.mkdir('-p', `${DEST}/.buildkite`)
+	shell.mkdir('-p', `${options.dest}/.buildkite`)
 	log(success("👍 Directories created!"))
 	callback()
 }
-function cpFiles(TEMP, DEST, name, callback){
+function cpFiles(options, callback){
 	log(warning("Copying the required files from Skeletal to our new theme."))
 	// Copy in some standard templates from Skeletal
-	shell.cp('-r', `${TEMP}/.latestSkeletal/src/templates/headers/template.html`,`${DEST}/src/templates/headers/`)
-	shell.cp('-r', `${TEMP}/.latestSkeletal/src/templates/footers/template.html`,`${DEST}/src/templates/footers/`)
-	shell.cp('-r', `${TEMP}/.latestSkeletal/src/templates/cms/home.template.html`,`${DEST}/src/templates/cms/`)
-	shell.cp('-r', `${TEMP}/.latestSkeletal/src/templates/skeletal-netothemeinfo.txt`,`${DEST}/src/templates/${name}-netothemeinfo.txt`)
-	// Copy in less
-	shell.cp('-r', `${TEMP}/.latestSkeletal/src/css/less/_custom.less`,`${DEST}/src/css/less/`)
-	shell.cp('-r', `${TEMP}/.latestSkeletal/src/css/less/_neto.less`,`${DEST}/src/css/less/`)
-	shell.cp('-r', `${TEMP}/.latestSkeletal/src/css/less/_variables.less`,`${DEST}/src/css/less/`)
-	shell.cp('-r', `${TEMP}/.latestSkeletal/src/css/less/app.less`,`${DEST}/src/css/less/`)
+	shell.cp('-r', `${options.temp}/.latestSkeletal/src/templates/headers/template.html`,`${options.dest}/src/templates/headers/`)
+	shell.cp('-r', `${options.temp}/.latestSkeletal/src/templates/footers/template.html`,`${options.dest}/src/templates/footers/`)
+	shell.cp('-r', `${options.temp}/.latestSkeletal/src/templates/cms/home.template.html`,`${options.dest}/src/templates/cms/`)
+	shell.cp('-r', `${options.temp}/.latestSkeletal/src/templates/skeletal-netothemeinfo.txt`,`${options.dest}/src/templates/${options.name}-netothemeinfo.txt`)
+	if (fs.existsSync(`${options.temp}/.latestSkeletal/src/css/less`)) {
+		// Copy in less
+		shell.cp('-r', `${options.temp}/.latestSkeletal/src/css/less/_custom.less`,`${options.dest}/src/css/less/`)
+		shell.cp('-r', `${options.temp}/.latestSkeletal/src/css/less/_neto.less`,`${options.dest}/src/css/less/`)
+		shell.cp('-r', `${options.temp}/.latestSkeletal/src/css/less/_variables.less`,`${options.dest}/src/css/less/`)
+		shell.cp('-r', `${options.temp}/.latestSkeletal/src/css/less/app.less`,`${options.dest}/src/css/less/`)
+	}else if (fs.existsSync(`${options.temp}/.latestSkeletal/src/scss`)) {
+		// Copy in sass
+		shell.cp('-r', `${options.temp}/.latestSkeletal/src/scss/_custom.scss`,`${options.dest}/src/scss/`)
+		shell.cp('-r', `${options.temp}/.latestSkeletal/src/scss/_neto.scss`,`${options.dest}/src/scss/`)
+		shell.cp('-r', `${options.temp}/.latestSkeletal/src/scss/_bootstrap.scss`,`${options.dest}/src/scss/`)
+		shell.cp('-r', `${options.temp}/.latestSkeletal/src/scss/app.scss`,`${options.dest}/src/scss/`)
+	}
 	// Copy in css
-	shell.cp('-r', `${TEMP}/.latestSkeletal/src/css/app.css`,`${DEST}/src/css/`)
-	shell.cp('-r', `${TEMP}/.latestSkeletal/src/css/skeletal-style.css`,`${DEST}/src/css/${DEST}-style.css`)
+	shell.cp('-r', `${options.temp}/.latestSkeletal/src/css/app.css`,`${options.dest}/src/css/`)
+	shell.cp('-r', `${options.temp}/.latestSkeletal/src/css/skeletal-style.css`,`${options.dest}/src/css/${options.dest}-style.css`)
 	// Copy some other required files
-	shell.cp('-r', `${TEMP}/.latestSkeletal/.gitignore`,`${DEST}/`)
-	shell.cp('-r', `${TEMP}/.latestSkeletal/gulpfile.js`,`${DEST}/`)
-	shell.cp('-r', `${TEMP}/.latestSkeletal/package-lock.json`,`${DEST}/`)
-	shell.cp('-r', `${TEMP}/.latestSkeletal/package.json`,`${DEST}/`)
-	shell.cp('-r', `${TEMP}/.latestSkeletal/README.md`,`${DEST}/`)
+	shell.cp('-r', `${options.temp}/.latestSkeletal/.gitignore`,`${options.dest}/`)
+	shell.cp('-r', `${options.temp}/.latestSkeletal/gulpfile.js`,`${options.dest}/`)
+	shell.cp('-r', `${options.temp}/.latestSkeletal/package-lock.json`,`${options.dest}/`)
+	shell.cp('-r', `${options.temp}/.latestSkeletal/package.json`,`${options.dest}/`)
+	shell.cp('-r', `${options.temp}/.latestSkeletal/README.md`,`${options.dest}/`)
 	// Copy buildkite
-	shell.cp('-r', `${TEMP}/.latestSkeletal/.buildkite/.`,`${DEST}/.buildkite/`)
+	shell.cp('-r', `${options.temp}/.latestSkeletal/.buildkite/.`,`${options.dest}/.buildkite/`)
 	log(success("👍 Copying done!"))
 	// Remove temp folder
-	shell.rm('-rf', TEMP)
+	shell.rm('-rf', options.temp)
 	callback()
 }
-function installModules(DEST, callback){
-	log(warning("Installing all of the NPM dependecies."))
+function installModules(options, callback){
+	log(warning("Installing all of the theme dependecies."))
 	// Setup NPM
-	shell.cd(`${DEST}`)
+	shell.cd(`${options.dest}`)
 	shell.exec('npm install')
 	log(success("👍👍👍 Modules installed!"))
 	callback()
