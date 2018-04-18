@@ -10,10 +10,20 @@ const warning = chalk.yellow
 module.exports.compileTheme = (opt) => {
 	var options = {}
 	// Folder where everything will be compiled to
-	options.dist = "./dist"
-	options.pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'))
-	options.temp = '.latestSkeletal'
 	options.master = opt.master
+	options.dist = './dist'
+	options.tempSkeletal = `${options.dist}/.latestSkeletal`
+
+	options.src = 'src'
+	options.TEMPLATES = `${options.src}/templates`
+	options.CSS = `${options.src}/css`
+	options.LESS = `${options.CSS}/less`
+	options.SCSS = `${options.src}/scss`
+	options.JS = `${options.src}/js`
+	options.IMG = `${options.src}/img`
+	if (fs.existsSync('./package.json')) {
+		options.pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'))
+	}
 	if(opt.branch !== undefined){
 		options.branch = opt.branch
 	}else{
@@ -27,33 +37,31 @@ module.exports.compileTheme = (opt) => {
 	if(options.master !== true){
 		if(options.branch !== undefined){
 			log(warning(`Fetching version ${options.branch} of Skeletal.`))
-			shell.exec(`git clone -b "${options.branch}" --depth 1 https://github.com/NetoECommerce/Skeletal.git ${options.dist}/${options.temp}`)
+			shell.exec(`git clone -b "${options.branch}" --depth 1 https://github.com/NetoECommerce/Skeletal.git ${options.tempSkeletal}`)
 		}else{
 			log(warning("No branch/tag defined, Fetching latest version of Skeletal."))
-			shell.exec(`git clone --depth 1 https://github.com/NetoECommerce/Skeletal.git ${options.dist}/${options.temp}`)
+			shell.exec(`git clone --depth 1 https://github.com/NetoECommerce/Skeletal.git ${options.tempSkeletal}`)
 		}
 	}
 
 	options.themes = getThemeNames(options)
 
 	zipThemes(options, function(){
-		shell.cd("./dist/")
 		if(options.master !== true){
-			shell.rm('-rf', `./${options.temp}`)
+			shell.rm('-rf', `${options.tempSkeletal}`)
 		}
 		log(warning("Compressing themes..."))
-
+		shell.cd(`${options.dist}/`)
 		fs.readdirSync('./').forEach(themeFolder => {
 			// Zip each folder
 			shell.exec(`zip -rq ${themeFolder}.zip ${themeFolder}`)
 			shell.rm('-rf', themeFolder);
 		})
-
 		shell.cd("../")
 		log(success("👍👍👍 Swag!"))
-		shell.exit(1)
 	})
 }
+// Place the theme names into an array
 function getThemeNames(options){
 	var themes = []
 	if(options.pkg.theme_names){
@@ -61,7 +69,7 @@ function getThemeNames(options){
 		themes = options.pkg.theme_names
 	}else{
 		log(warning('Using neto-theme-info file to create theme(s)'))
-		var files = fs.readdirSync('./src/templates')
+		var files = fs.readdirSync(`./${options.TEMPLATES}`)
 		files.forEach(file => {
 			if(file.indexOf("-netothemeinfo.txt") !== -1){
 				var theme = file.replace(/-netothemeinfo.txt*$/, "")
@@ -71,46 +79,49 @@ function getThemeNames(options){
 	}
 	return themes;
 }
+// Create a zip file for each theme
 function zipThemes(options, callback){
 	options.themes.forEach(theme => {
 		log(warning(`Building '${theme}' theme...`))
+		var themeFolder = `${options.dist}/${theme}`
+		var themeAssetsFolder = `${themeFolder}/_assets`
 		// Create theme folder
 		shell.mkdir('-p', `${options.dist}/${theme}`)
-		shell.mkdir('-p', `${options.dist}/${theme}/_assets`)
+		shell.mkdir('-p', themeAssetsFolder)
 		if(options.master !== true){
 			// Copy latest from Skeletal
-			shell.cp('-r', `${options.dist}/${options.temp}/src/templates/.`, `${options.dist}/${theme}/`)
-			shell.cp('-r', `${options.dist}/${options.temp}/src/css`, `${options.dist}/${theme}/_assets`)
-			if (fs.existsSync(`${options.dist}/${options.temp}/src/scss`)) {
-				shell.cp('-r', `${options.dist}/${options.temp}/src/scss`, `${options.dist}/${theme}/_assets`)
+			shell.cp('-r', `${options.tempSkeletal}/${options.TEMPLATES}/.`, `${themeFolder}/`)
+			shell.cp('-r', `${options.tempSkeletal}/${options.CSS}`, themeAssetsFolder)
+			if (fs.existsSync(`${options.tempSkeletal}/${options.SCSS}`)) {
+				shell.cp('-r', `${options.tempSkeletal}/${options.SCSS}`, themeAssetsFolder)
 			}
-			shell.cp('-r', `${options.dist}/${options.temp}/src/js`, `${options.dist}/${theme}/_assets`)
+			shell.cp('-r', `${options.tempSkeletal}/${options.JS}`, themeAssetsFolder)
 		}
 		// Copy templates
-		shell.cp('-r', `./src/templates/.`, `${options.dist}/${theme}/`)
+		shell.cp('-r', `./${options.TEMPLATES}/.`, `${themeFolder}/`)
 		// Copy assets
-		if (fs.existsSync('./src/css')) {
-			shell.cp('-r', `./src/css`, `${options.dist}/${theme}/_assets`)
+		if (fs.existsSync(`./${options.CSS}`)) {
+			shell.cp('-r', `./${options.CSS}`, themeAssetsFolder)
 		}
-		if (fs.existsSync('./src/scss')) {
-			shell.cp('-r', `./src/scss`, `${options.dist}/${theme}/_assets`)
+		if (fs.existsSync(`./${options.SCSS}`)) {
+			shell.cp('-r', `./${options.SCSS}`, themeAssetsFolder)
 		}
-		if (fs.existsSync('./src/js')) {
-			shell.cp('-r', `./src/js`, `${options.dist}/${theme}/_assets`)
+		if (fs.existsSync(`./${options.JS}`)) {
+			shell.cp('-r', `./${options.JS}`, themeAssetsFolder)
 		}
-		if (fs.existsSync('./src/img')) {
-			shell.cp('-r', `./src/img`, `${options.dist}/${theme}/_assets`)
+		if (fs.existsSync(`./${options.IMG}`)) {
+			shell.cp('-r', `./${options.IMG}`, themeAssetsFolder)
 		}
 		if (fs.existsSync('./gulpfile.js')) {
-			shell.cp('-r', `./gulpfile.js`, `${options.dist}/${theme}/_assets`)
+			shell.cp('-r', `./gulpfile.js`, themeAssetsFolder)
 		}
 		if (fs.existsSync('./package.json')) {
-			shell.cp('-r', `./package.json`, `${options.dist}/${theme}/_assets`)
+			shell.cp('-r', `./package.json`, themeAssetsFolder)
 		}
 		// Rename stylesheet to style.css
-		shell.mv(`${options.dist}/${theme}/_assets/css/${theme}-style.css`, `${options.dist}/${theme}/_assets/css/style.css`)
+		shell.mv(`${themeAssetsFolder}/css/${theme}-style.css`, `${themeAssetsFolder}/css/style.css`)
 		// Rename info file to netothemeinfo.txt
-		shell.mv(`${options.dist}/${theme}/${theme}-netothemeinfo.txt`, `${options.dist}/${theme}/netothemeinfo.txt`)
+		shell.mv(`${themeFolder}/${theme}-netothemeinfo.txt`, `${themeFolder}/netothemeinfo.txt`)
 		log(success(`👍 ${theme} built!`))
 	})
 	callback()
