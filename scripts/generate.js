@@ -8,7 +8,7 @@ const success = chalk.green
 const warning = chalk.yellow
 
 module.exports.generateTheme = (name, branch) => {
-	// Folder where everything will be compiled to
+	// Setup variables
 	var options = {}
 	if(name){
 		options.dest = `./${name}`
@@ -29,14 +29,11 @@ module.exports.generateTheme = (name, branch) => {
 	}else{
 		options.branch = undefined
 	}
-
 	// Remove dist and temp directories
 	shell.rm('-rf', options.dest)
 	shell.mkdir('-p', options.dest)
 	shell.rm('-rf', options.tempFolder)
 	shell.mkdir('-p', options.tempFolder)
-
-	// Determine the theme list dynamically
 	shell.cd('./')
 
 	log(success("Theme starter kit 👜"))
@@ -51,8 +48,9 @@ module.exports.generateTheme = (name, branch) => {
 		shell.exec(`git clone --depth 1 https://github.com/NetoECommerce/Skeletal.git ${options.tempSkeletal}`)
 	}
 	log(success("👍 Skeletal cloned!"))
+
 	makeDir(options, function(){
-		cpFiles(options, function(){
+		copyFiles(options, function(){
 			installModules(options, function(){
 				log(success(`Your new theme is located at ${options.dest}. You can go there in terminal with the command cd ${options.dest}`))
 				log(success("Congratulations! You can now start working on your new theme."))
@@ -76,13 +74,11 @@ function makeDir(options, callback){
 	}else if (fs.existsSync(`${options.tempSkeletal}/${options.SCSS}`)) {
 		shell.mkdir('-p', `${options.dest}/${options.SCSS}`)
 	}
-	// Create Buildkite directory
-	shell.mkdir('-p', `${options.dest}/.buildkite`)
 	log(success("👍 Directories created!"))
 	callback()
 }
 // Copy over required files from Skeletal
-function cpFiles(options, callback){
+function copyFiles(options, callback){
 	log(warning("Copying the required files from Skeletal to our new theme."))
 	// Copy in required templates from Skeletal
 	shell.cp('-r', `${options.tempSkeletal}/${options.TEMPLATES}/headers/template.html`,`${options.dest}/${options.TEMPLATES}/headers/`)
@@ -111,7 +107,6 @@ function cpFiles(options, callback){
 	shell.cp('-r', `${options.tempSkeletal}/package-lock.json`,`${options.dest}/`)
 	shell.cp('-r', `${options.tempSkeletal}/package.json`,`${options.dest}/`)
 	shell.cp('-r', `${options.tempSkeletal}/README.md`,`${options.dest}/`)
-	shell.cp('-r', `${options.tempSkeletal}/.buildkite/.`,`${options.dest}/.buildkite/`)
 	log(success("👍 Copying done!"))
 	// Remove temp folder
 	shell.rm('-rf', options.tempFolder)
@@ -119,6 +114,16 @@ function cpFiles(options, callback){
 }
 // Install npm modules
 function installModules(options, callback){
+	// Add Skeletal as a dependency
+	if (fs.existsSync(`${options.dest}/package.json`)) {
+		options.pkg = JSON.parse(fs.readFileSync(`${options.dest}/package.json`, 'utf8'))
+		if(options.branch !== undefined){
+			options.pkg.devDependencies.Skeletal = `git://github.com/NetoECommerce/Skeletal.git#${options.branch}`
+		}else{
+			options.pkg.devDependencies.Skeletal = "git://github.com/NetoECommerce/Skeletal.git"
+		}
+		fs.writeFileSync(`${options.dest}/package.json`, JSON.stringify(options.pkg, null, 2))
+	}
 	log(warning("Installing all of the theme dependecies."))
 	shell.cd(`${options.dest}`)
 	shell.exec('npm install')
