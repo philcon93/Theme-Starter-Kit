@@ -119,8 +119,14 @@ function installModules(options, callback){
 		options.pkg = JSON.parse(fs.readFileSync(`${options.dest}/package.json`, 'utf8'))
 		if(options.branch !== undefined){
 			options.pkg.devDependencies.Skeletal = `git://github.com/NetoECommerce/Skeletal.git#${options.branch}`
+			options.pkg.generated_theme = {
+				"name": "Skeletal","branch": options.branch,"git": `git://github.com/NetoECommerce/Skeletal.git#${options.branch}`
+			}
 		}else{
 			options.pkg.devDependencies.Skeletal = "git://github.com/NetoECommerce/Skeletal.git"
+			options.pkg.generated_theme = {
+				"name": "Skeletal","branch": 'master',"git": 'git://github.com/NetoECommerce/Skeletal.git'
+			}
 		}
 		fs.writeFileSync(`${options.dest}/package.json`, JSON.stringify(options.pkg, null, 2))
 	}
