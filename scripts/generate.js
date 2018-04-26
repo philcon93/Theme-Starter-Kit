@@ -25,6 +25,9 @@ module.exports.generateTheme = (name, branch) => {
 	options.LESS = `${options.CSS}/less`
 	options.SCSS = `${options.src}/scss`
 	branch ? options.branch = branch : options.branch = undefined
+	options.generatedThemeName = 'Skeletal'
+	options.generatedThemeOwner = 'NetoECommerce'
+	options.generatedThemeGit = `git://github.com/${options.generatedThemeOwner}/${options.generatedThemeName}.git`
 	// Remove dist and temp directories
 	shell.rm('-rf', options.dest)
 	shell.mkdir('-p', options.dest)
@@ -37,10 +40,10 @@ module.exports.generateTheme = (name, branch) => {
 	log(warning("Building a new theme"))
 	// Get master theme
 	if(options.branch){
-		log(warning(`Cloning version ${options.branch} of Skeletal.`))
+		log(warning(`Cloning version ${options.branch} of ${options.generatedThemeName}.`))
 		shell.exec(`git clone -b "${options.branch}" --depth 1 https://github.com/NetoECommerce/Skeletal.git ${options.tempSkeletal}`)
 	}else{
-		log(warning("No branch/tag defined, cloning latest version of Skeletal."))
+		log(warning(`No branch/tag defined, cloning latest version of ${options.generatedThemeName}.`))
 		shell.exec(`git clone --depth 1 https://github.com/NetoECommerce/Skeletal.git ${options.tempSkeletal}`)
 	}
 	log(success("👍 Skeletal cloned!"))
@@ -113,9 +116,6 @@ function installModules(options, callback){
 	// Add Skeletal as a dependency
 	if (fs.existsSync(`${options.dest}/package.json`)) {
 		options.pkg = JSON.parse(fs.readFileSync(`${options.dest}/package.json`, 'utf8'))
-		options.generatedThemeName = 'Skeletal'
-		options.generatedThemeOwner = 'NetoECommerce'
-		options.generatedThemeGit = `git://github.com/${options.generatedThemeOwner}/${options.generatedThemeName}.git`
 		if(options.branch){
 			options.pkg.devDependencies.Skeletal = `${options.generatedThemeGit}#${options.branch}`
 			options.pkg.generated_theme = { "name": `${options.generatedThemeName}`,"branch": options.branch,"git": `${options.generatedThemeGit}#${options.branch}`}
