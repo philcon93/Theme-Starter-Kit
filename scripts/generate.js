@@ -24,11 +24,7 @@ module.exports.generateTheme = (name, branch) => {
 	options.CSS = `${options.src}/css`
 	options.LESS = `${options.CSS}/less`
 	options.SCSS = `${options.src}/scss`
-	if(branch !== undefined){
-		options.branch = branch
-	}else{
-		options.branch = undefined
-	}
+	branch ? options.branch = branch : options.branch = undefined
 	// Remove dist and temp directories
 	shell.rm('-rf', options.dest)
 	shell.mkdir('-p', options.dest)
@@ -40,7 +36,7 @@ module.exports.generateTheme = (name, branch) => {
 	log(success("This script will setup a new theme repository for you so you can start working on a new website."))
 	log(warning("Building a new theme"))
 	// Get master theme
-	if(options.branch !== undefined){
+	if(options.branch){
 		log(warning(`Cloning version ${options.branch} of Skeletal.`))
 		shell.exec(`git clone -b "${options.branch}" --depth 1 https://github.com/NetoECommerce/Skeletal.git ${options.tempSkeletal}`)
 	}else{
@@ -117,16 +113,15 @@ function installModules(options, callback){
 	// Add Skeletal as a dependency
 	if (fs.existsSync(`${options.dest}/package.json`)) {
 		options.pkg = JSON.parse(fs.readFileSync(`${options.dest}/package.json`, 'utf8'))
-		if(options.branch !== undefined){
-			options.pkg.devDependencies.Skeletal = `git://github.com/NetoECommerce/Skeletal.git#${options.branch}`
-			options.pkg.generated_theme = {
-				"name": "Skeletal","branch": options.branch,"git": `git://github.com/NetoECommerce/Skeletal.git#${options.branch}`
-			}
+		options.generatedThemeName = 'Skeletal'
+		options.generatedThemeOwner = 'NetoECommerce'
+		options.generatedThemeGit = `git://github.com/${options.generatedThemeOwner}/${options.generatedThemeName}.git`
+		if(options.branch){
+			options.pkg.devDependencies.Skeletal = `${options.generatedThemeGit}#${options.branch}`
+			options.pkg.generated_theme = { "name": `${options.generatedThemeName}`,"branch": options.branch,"git": `${options.generatedThemeGit}#${options.branch}`}
 		}else{
-			options.pkg.devDependencies.Skeletal = "git://github.com/NetoECommerce/Skeletal.git"
-			options.pkg.generated_theme = {
-				"name": "Skeletal","branch": 'master',"git": 'git://github.com/NetoECommerce/Skeletal.git'
-			}
+			options.pkg.devDependencies.Skeletal = `${options.generatedThemeGit}`
+			options.pkg.generated_theme = { "name": `${options.generatedThemeName}`,"branch": 'master',"git": `${options.generatedThemeGit}`}
 		}
 		fs.writeFileSync(`${options.dest}/package.json`, JSON.stringify(options.pkg, null, 2))
 	}

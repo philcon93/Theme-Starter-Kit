@@ -35,7 +35,10 @@ module.exports.compileTheme = (opt) => {
 	shell.cd('./')
 
 	if(options.master !== true){
-		if(options.branch !== undefined){
+		if(options.pkg.generated_theme && options.pkg.generated_theme.branch !== 'master'){
+			log(warning(`Fetching version ${options.pkg.generated_theme.branch} of Skeletal.`))
+			shell.exec(`git clone -b "${options.pkg.generated_theme.branch}" --depth 1 https://github.com/NetoECommerce/Skeletal.git ${options.tempSkeletal}`)
+		}else if(options.branch !== undefined){
 			log(warning(`Fetching version ${options.branch} of Skeletal.`))
 			shell.exec(`git clone -b "${options.branch}" --depth 1 https://github.com/NetoECommerce/Skeletal.git ${options.tempSkeletal}`)
 		}else{
