@@ -7,7 +7,7 @@ const log = console.log
 const success = chalk.green
 const warning = chalk.yellow
 
-module.exports.generateTheme = (name, branch) => {
+module.exports.generate = (name, branch) => {
 	// Setup variables
 	var options = {}
 	if(name){
@@ -35,9 +35,9 @@ module.exports.generateTheme = (name, branch) => {
 	shell.mkdir('-p', options.tempFolder)
 	shell.cd('./')
 
-	log(success("Theme starter kit 👜"))
-	log(success("This script will setup a new theme repository for you so you can start working on a new website."))
-	log(warning("Building a new theme"))
+	log(success("Theme Starter Kit 👜"))
+	log(success("This script will setup a Neto theme so you can start developing a new theme"))
+	log(warning("Generating new theme"))
 	// Get master theme
 	if(options.branch){
 		log(warning(`Cloning version ${options.branch} of ${options.generatedThemeName}.`))
@@ -116,6 +116,7 @@ function installModules(options, callback){
 	// Add Skeletal as a dependency
 	if (fs.existsSync(`${options.dest}/package.json`)) {
 		options.pkg = JSON.parse(fs.readFileSync(`${options.dest}/package.json`, 'utf8'))
+		options.pkg.name = options.name
 		if(options.branch){
 			options.pkg.devDependencies.Skeletal = `${options.generatedThemeGit}#${options.branch}`
 			options.pkg.generated_theme = { "name": `${options.generatedThemeName}`,"branch": options.branch,"git": `${options.generatedThemeGit}#${options.branch}`}
@@ -127,7 +128,7 @@ function installModules(options, callback){
 	}
 	log(warning("Installing all of the theme dependecies."))
 	shell.cd(`${options.dest}`)
-	shell.exec('npm install')
+	shell.exec('npm i')
 	log(success("👍👍👍 Modules installed!"))
 	callback()
 }
