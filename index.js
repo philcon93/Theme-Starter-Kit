@@ -2,28 +2,40 @@
 
 const program = require('commander');
 const pkg = require('./package.json');
-const { generateTheme } = require('./scripts/generate');
-const { compileTheme } = require('./scripts/compile.js');
+const { generate } = require('./scripts/generate');
+const { compile } = require('./scripts/compile.js');
+const { migrate } = require('./scripts/migrate.js');
 
 program
 	.version(pkg.version)
 
 program
 	.command('generate <themeName>')
+	.alias('g')
 	.option('-b, --branch <branchName>', 'Branch name or release tag')
-	.description('Create a new Neto theme')
+	.description('Generates a Neto theme based on a Skeletal branch')
 	.action(function (themeName, options){
-		generateTheme(themeName, options.branch)
+		generate(themeName, options.branch)
 	});
 
 program
 	.command('compile')
+	.alias('c')
 	.option('-b, --branch <branchName>', 'Branch name or release tag')
 	.option('-m, --master', 'Compiles a master theme')
-	.description('Compiles a Neto theme')
+	.description('Compiles a Neto theme for the theme store')
 	.action(function (options){
-		compileTheme(options)
+		compile(options)
 	});
+
+	program
+		.command('migrate')
+		.alias('m')
+		.option('-b, --branch <branchName>', 'Branch name or release tag')
+		.description('Migrates a Neto theme so it can use the other Theme Starter Kit scripts based on a Skeletal branch')
+		.action(function (options){
+			migrate(options.branch)
+		});
 
 program.parse(process.argv);
 

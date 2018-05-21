@@ -7,7 +7,7 @@ const log = console.log
 const success = chalk.green
 const warning = chalk.yellow
 
-module.exports.compileTheme = (opt) => {
+module.exports.compile = (opt) => {
 	var options = {}
 	// Folder where everything will be compiled to
 	options.master = opt.master
@@ -29,6 +29,10 @@ module.exports.compileTheme = (opt) => {
 	}else{
 		options.branch = undefined
 	}
+	log(success("Theme Starter Kit 👜"))
+	log(success("This script will compile a Neto theme so it is ready for the theme store"))
+	log(warning("Compiling theme"))
+
 	// Recreate the 'dist' directory
 	shell.rm('-rf', options.dist)
 	shell.mkdir('-p', options.dist)
