@@ -23,6 +23,7 @@ program
 	.alias('c')
 	.option('-b, --branch <branchName>', 'Branch name or release tag')
 	.option('-m, --master', 'Compiles a master theme')
+	.option('-u, --uncompressed', 'Compiles a theme as if it was installed from theme store')
 	.description('Compiles a Neto theme for the theme store')
 	.action(function (options){
 		compile(options)

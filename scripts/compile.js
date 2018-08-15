@@ -11,6 +11,7 @@ module.exports.compile = (opt) => {
 	var options = {}
 	// Folder where everything will be compiled to
 	options.master = opt.master
+	options.uncompressed = opt.uncompressed
 	options.dist = './dist'
 	options.tempSkeletal = `${options.dist}/.latestSkeletal`
 
@@ -57,14 +58,16 @@ module.exports.compile = (opt) => {
 		if(options.master !== true){
 			shell.rm('-rf', `${options.tempSkeletal}`)
 		}
-		log(warning("Compressing themes..."))
-		shell.cd(`${options.dist}/`)
-		fs.readdirSync('./').forEach(themeFolder => {
-			// Zip each folder
-			shell.exec(`zip -rq ${themeFolder}.zip ${themeFolder}`)
-			shell.rm('-rf', themeFolder);
-		})
-		shell.cd("../")
+		if(options.uncompressed !== true){
+			log(warning("Compressing themes..."))
+			shell.cd(`${options.dist}/`)
+			fs.readdirSync('./').forEach(themeFolder => {
+				// Zip each folder
+				shell.exec(`zip -rq ${themeFolder}.zip ${themeFolder}`)
+				shell.rm('-rf', themeFolder);
+			})
+			shell.cd("../")
+		}
 		log(success("👍👍👍 Swag!"))
 	})
 }
@@ -91,7 +94,11 @@ function zipThemes(options, callback){
 	options.themes.forEach(theme => {
 		log(warning(`Building '${theme}' theme...`))
 		var themeFolder = `${options.dist}/${theme}`
-		var themeAssetsFolder = `${themeFolder}/_assets`
+		if(options.uncompressed !== true){
+			var themeAssetsFolder = `${themeFolder}`
+		}else{
+			var themeAssetsFolder = `${themeFolder}/_assets`
+		}
 		// Create theme folder
 		shell.mkdir('-p', `${options.dist}/${theme}`)
 		shell.mkdir('-p', themeAssetsFolder)
