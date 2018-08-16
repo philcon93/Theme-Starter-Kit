@@ -44,7 +44,7 @@ ntheme compile
 
 For a theme to be published to the Neto theme store, it has to be compiled in a certain way which this module takes care of. In order for the compile script to work correctly, your theme will need:
 
-### Theme info file
+### 1. Theme info file
 
 Either your theme can have a `THEME_NAME-netohemeinfo.txt` file which is in the templates directory:
 
@@ -65,11 +65,19 @@ Or if you do not want to include this file, you can adjust your `package.json` t
 "theme_names": [ "THEME_NAME" ]
 ```
 
-### Stylesheet
+### 2. Stylesheet
 
 Ensure you have a stylesheet in `./css` called `THEME_NAME-style.css`. This file should contain all your theme editor styles.
 
 ### Options
+
+**-u**
+
+Compiles a theme as if it was installed from theme store, useful if you want to place your theme up via FTP. This can be useful for starting a theme, as you don't have to install Skeletal on your development site, then sync your theme on top of it. That workflow doesn't work if your master theme is a different branch to Skeletal master. It's useful while in development because the stylesheet will be renamed from `THEME_NAME-style.css` to `style.css`, which the header template is referencing. And finally it is useful because this compiled version is the outputted version merchants will get, so it will give you a better understanding of the final product.
+
+```
+ntheme compile -u
+```
 
 **-b 'branch'**
 

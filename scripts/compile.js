@@ -11,8 +11,10 @@ module.exports.compile = (opt) => {
 	var options = {}
 	// Folder where everything will be compiled to
 	options.master = opt.master
+	options.uncompressed = opt.uncompressed
+	options.branch = opt.branch
 	options.dist = './dist'
-	options.tempSkeletal = `${options.dist}/.latestSkeletal`
+	options.masterTheme = `${options.dist}/.masterTheme`
 
 	options.src = 'src'
 	options.TEMPLATES = `${options.src}/templates`
@@ -24,11 +26,7 @@ module.exports.compile = (opt) => {
 	if (fs.existsSync('./package.json')) {
 		options.pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'))
 	}
-	if(opt.branch !== undefined){
-		options.branch = opt.branch
-	}else{
-		options.branch = undefined
-	}
+
 	log(success("Theme Starter Kit 👜"))
 	log(success("This script will compile a Neto theme so it is ready for the theme store"))
 	log(warning("Compiling theme"))
@@ -38,33 +36,35 @@ module.exports.compile = (opt) => {
 	shell.mkdir('-p', options.dist)
 	shell.cd('./')
 
-	if(options.master !== true){
+	if(options.master == undefined){
 		if(options.pkg.generated_theme && options.pkg.generated_theme.branch !== 'master'){
 			log(warning(`Fetching version ${options.pkg.generated_theme.branch} of Skeletal.`))
-			shell.exec(`git clone -b "${options.pkg.generated_theme.branch}" --depth 1 https://github.com/NetoECommerce/Skeletal.git ${options.tempSkeletal}`)
+			shell.exec(`git clone -b "${options.pkg.generated_theme.branch}" --depth 1 https://github.com/NetoECommerce/Skeletal.git ${options.masterTheme}`)
 		}else if(options.branch !== undefined){
 			log(warning(`Fetching version ${options.branch} of Skeletal.`))
-			shell.exec(`git clone -b "${options.branch}" --depth 1 https://github.com/NetoECommerce/Skeletal.git ${options.tempSkeletal}`)
+			shell.exec(`git clone -b "${options.branch}" --depth 1 https://github.com/NetoECommerce/Skeletal.git ${options.masterTheme}`)
 		}else{
-			log(warning("No branch/tag defined, Fetching latest version of Skeletal."))
-			shell.exec(`git clone --depth 1 https://github.com/NetoECommerce/Skeletal.git ${options.tempSkeletal}`)
+			log(warning("Fetching latest version of Skeletal."))
+			shell.exec(`git clone --depth 1 https://github.com/NetoECommerce/Skeletal.git ${options.masterTheme}`)
 		}
 	}
 
 	options.themes = getThemeNames(options)
 
 	zipThemes(options, function(){
-		if(options.master !== true){
-			shell.rm('-rf', `${options.tempSkeletal}`)
+		if(options.master == undefined){
+			shell.rm('-rf', `${options.masterTheme}`)
 		}
-		log(warning("Compressing themes..."))
-		shell.cd(`${options.dist}/`)
-		fs.readdirSync('./').forEach(themeFolder => {
-			// Zip each folder
-			shell.exec(`zip -rq ${themeFolder}.zip ${themeFolder}`)
-			shell.rm('-rf', themeFolder);
-		})
-		shell.cd("../")
+		if(options.uncompressed == undefined){
+			log(warning("Compressing themes..."))
+			shell.cd(`${options.dist}/`)
+			fs.readdirSync('./').forEach(themeFolder => {
+				// Zip each folder
+				shell.exec(`zip -rq ${themeFolder}.zip ${themeFolder}`)
+				shell.rm('-rf', themeFolder);
+			})
+			shell.cd("../")
+		}
 		log(success("👍👍👍 Swag!"))
 	})
 }
@@ -91,18 +91,22 @@ function zipThemes(options, callback){
 	options.themes.forEach(theme => {
 		log(warning(`Building '${theme}' theme...`))
 		var themeFolder = `${options.dist}/${theme}`
-		var themeAssetsFolder = `${themeFolder}/_assets`
+		if(options.uncompressed == undefined){
+			var themeAssetsFolder = `${themeFolder}/_assets`
+		}else{
+			var themeAssetsFolder = `${themeFolder}`
+		}
 		// Create theme folder
 		shell.mkdir('-p', `${options.dist}/${theme}`)
 		shell.mkdir('-p', themeAssetsFolder)
-		if(options.master !== true){
+		if(options.master == undefined){
 			// Copy latest from Skeletal
-			shell.cp('-r', `${options.tempSkeletal}/${options.TEMPLATES}/.`, `${themeFolder}/`)
-			shell.cp('-r', `${options.tempSkeletal}/${options.CSS}`, themeAssetsFolder)
-			if (fs.existsSync(`${options.tempSkeletal}/${options.SCSS}`)) {
-				shell.cp('-r', `${options.tempSkeletal}/${options.SCSS}`, themeAssetsFolder)
+			shell.cp('-r', `${options.masterTheme}/${options.TEMPLATES}/.`, `${themeFolder}/`)
+			shell.cp('-r', `${options.masterTheme}/${options.CSS}`, themeAssetsFolder)
+			if (fs.existsSync(`${options.masterTheme}/${options.SCSS}`)) {
+				shell.cp('-r', `${options.masterTheme}/${options.SCSS}`, themeAssetsFolder)
 			}
-			shell.cp('-r', `${options.tempSkeletal}/${options.JS}`, themeAssetsFolder)
+			shell.cp('-r', `${options.masterTheme}/${options.JS}`, themeAssetsFolder)
 		}
 		// Copy templates
 		shell.cp('-r', `./${options.TEMPLATES}/.`, `${themeFolder}/`)
