@@ -39,7 +39,7 @@ module.exports.compile = (opt) => {
 	shell.mkdir('-p', options.dist)
 	shell.cd('./')
 
-	if(options.master !== true){
+	if(options.master == undefined){
 		if(options.pkg.generated_theme && options.pkg.generated_theme.branch !== 'master'){
 			log(warning(`Fetching version ${options.pkg.generated_theme.branch} of Skeletal.`))
 			shell.exec(`git clone -b "${options.pkg.generated_theme.branch}" --depth 1 https://github.com/NetoECommerce/Skeletal.git ${options.tempSkeletal}`)
@@ -55,10 +55,10 @@ module.exports.compile = (opt) => {
 	options.themes = getThemeNames(options)
 
 	zipThemes(options, function(){
-		if(options.master !== true){
+		if(options.master == undefined){
 			shell.rm('-rf', `${options.tempSkeletal}`)
 		}
-		if(options.uncompressed !== true){
+		if(options.uncompressed == undefined){
 			log(warning("Compressing themes..."))
 			shell.cd(`${options.dist}/`)
 			fs.readdirSync('./').forEach(themeFolder => {
@@ -94,15 +94,15 @@ function zipThemes(options, callback){
 	options.themes.forEach(theme => {
 		log(warning(`Building '${theme}' theme...`))
 		var themeFolder = `${options.dist}/${theme}`
-		if(options.uncompressed !== true){
-			var themeAssetsFolder = `${themeFolder}`
-		}else{
+		if(options.uncompressed == undefined){
 			var themeAssetsFolder = `${themeFolder}/_assets`
+		}else{
+			var themeAssetsFolder = `${themeFolder}`
 		}
 		// Create theme folder
 		shell.mkdir('-p', `${options.dist}/${theme}`)
 		shell.mkdir('-p', themeAssetsFolder)
-		if(options.master !== true){
+		if(options.master == undefined){
 			// Copy latest from Skeletal
 			shell.cp('-r', `${options.tempSkeletal}/${options.TEMPLATES}/.`, `${themeFolder}/`)
 			shell.cp('-r', `${options.tempSkeletal}/${options.CSS}`, themeAssetsFolder)
