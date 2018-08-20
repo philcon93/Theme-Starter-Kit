@@ -36,7 +36,7 @@ module.exports.compile = (opt) => {
 	shell.mkdir('-p', options.dist)
 	shell.cd('./')
 
-	if(options.master == undefined){
+	if(typeof options.master == "undefined"){
 		if(options.pkg.generated_theme && options.pkg.generated_theme.branch !== 'master'){
 			log(warning(`Fetching version ${options.pkg.generated_theme.branch} of Skeletal.`))
 			shell.exec(`git clone -b "${options.pkg.generated_theme.branch}" --depth 1 https://github.com/NetoECommerce/Skeletal.git ${options.masterTheme}`)
@@ -52,10 +52,10 @@ module.exports.compile = (opt) => {
 	options.themes = getThemeNames(options)
 
 	zipThemes(options, function(){
-		if(options.master == undefined){
+		if(typeof options.master == "undefined"){
 			shell.rm('-rf', `${options.masterTheme}`)
 		}
-		if(options.uncompressed == undefined){
+		if(typeof options.uncompressed == "undefined"){
 			log(warning("Compressing themes..."))
 			shell.cd(`${options.dist}/`)
 			fs.readdirSync('./').forEach(themeFolder => {
@@ -91,17 +91,19 @@ function zipThemes(options, callback){
 	options.themes.forEach(theme => {
 		log(warning(`Building '${theme}' theme...`))
 		var themeFolder = `${options.dist}/${theme}`
-		if(options.uncompressed == undefined){
+		if(typeof options.uncompressed == "undefined"){
+			var themeTemplatesFolder = `${themeFolder}`
 			var themeAssetsFolder = `${themeFolder}/_assets`
 		}else{
+			var themeTemplatesFolder = `${themeFolder}/templates`
 			var themeAssetsFolder = `${themeFolder}`
 		}
 		// Create theme folder
-		shell.mkdir('-p', `${options.dist}/${theme}`)
+		shell.mkdir('-p', themeFolder)
 		shell.mkdir('-p', themeAssetsFolder)
-		if(options.master == undefined){
+		if(typeof options.master == "undefined"){
 			// Copy latest from Skeletal
-			shell.cp('-r', `${options.masterTheme}/${options.TEMPLATES}/.`, `${themeFolder}/`)
+			shell.cp('-r', `${options.masterTheme}/${options.TEMPLATES}/.`, themeTemplatesFolder)
 			shell.cp('-r', `${options.masterTheme}/${options.CSS}`, themeAssetsFolder)
 			if (fs.existsSync(`${options.masterTheme}/${options.SCSS}`)) {
 				shell.cp('-r', `${options.masterTheme}/${options.SCSS}`, themeAssetsFolder)
@@ -109,7 +111,7 @@ function zipThemes(options, callback){
 			shell.cp('-r', `${options.masterTheme}/${options.JS}`, themeAssetsFolder)
 		}
 		// Copy templates
-		shell.cp('-r', `./${options.TEMPLATES}/.`, `${themeFolder}/`)
+		shell.cp('-r', `./${options.TEMPLATES}/.`, themeTemplatesFolder)
 		// Copy assets
 		if (fs.existsSync(`./${options.CSS}`)) {
 			shell.cp('-r', `./${options.CSS}`, themeAssetsFolder)
@@ -129,10 +131,10 @@ function zipThemes(options, callback){
 		if (fs.existsSync('./package.json')) {
 			shell.cp('-r', `./package.json`, themeAssetsFolder)
 		}
+		// Rename info file to netothemeinfo.txt
+		shell.mv(`${themeTemplatesFolder}/${theme}-netothemeinfo.txt`, `${themeTemplatesFolder}/netothemeinfo.txt`)
 		// Rename stylesheet to style.css
 		shell.mv(`${themeAssetsFolder}/css/${theme}-style.css`, `${themeAssetsFolder}/css/style.css`)
-		// Rename info file to netothemeinfo.txt
-		shell.mv(`${themeFolder}/${theme}-netothemeinfo.txt`, `${themeFolder}/netothemeinfo.txt`)
 		log(success(`👍 ${theme} built!`))
 	})
 	callback()
