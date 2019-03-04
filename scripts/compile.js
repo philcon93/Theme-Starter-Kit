@@ -103,33 +103,33 @@ function zipThemes(options, callback){
 		shell.mkdir('-p', themeAssetsFolder)
 		if(typeof options.master == "undefined"){
 			// Copy latest from Skeletal
-			shell.cp('-r', `${options.masterTheme}/${options.TEMPLATES}/.`, themeTemplatesFolder)
-			shell.cp('-r', `${options.masterTheme}/${options.CSS}`, themeAssetsFolder)
+			shell.cp('-R', `${options.masterTheme}/${options.TEMPLATES}/.`, themeTemplatesFolder)
+			shell.cp('-R', `${options.masterTheme}/${options.CSS}`, themeAssetsFolder)
 			if (fs.existsSync(`${options.masterTheme}/${options.SCSS}`)) {
-				shell.cp('-r', `${options.masterTheme}/${options.SCSS}`, themeAssetsFolder)
+				shell.cp('-R', `${options.masterTheme}/${options.SCSS}`, themeAssetsFolder)
 			}
-			shell.cp('-r', `${options.masterTheme}/${options.JS}`, themeAssetsFolder)
+			shell.cp('-R', `${options.masterTheme}/${options.JS}`, themeAssetsFolder)
 		}
 		// Copy templates
-		shell.cp('-r', `./${options.TEMPLATES}/.`, themeTemplatesFolder)
+		shell.cp('-R', `./${options.TEMPLATES}/.`, themeTemplatesFolder)
 		// Copy assets
 		if (fs.existsSync(`./${options.CSS}`)) {
-			shell.cp('-r', `./${options.CSS}`, themeAssetsFolder)
+			shell.cp('-R', `./${options.CSS}`, themeAssetsFolder)
 		}
 		if (fs.existsSync(`./${options.SCSS}`)) {
-			shell.cp('-r', `./${options.SCSS}`, themeAssetsFolder)
+			shell.cp('-R', `./${options.SCSS}`, themeAssetsFolder)
 		}
 		if (fs.existsSync(`./${options.JS}`)) {
-			shell.cp('-r', `./${options.JS}`, themeAssetsFolder)
+			shell.cp('-R', `./${options.JS}`, themeAssetsFolder)
 		}
 		if (fs.existsSync(`./${options.IMG}`)) {
-			shell.cp('-r', `./${options.IMG}`, themeAssetsFolder)
+			shell.cp('-R', `./${options.IMG}`, themeAssetsFolder)
 		}
 		if (fs.existsSync('./gulpfile.js')) {
-			shell.cp('-r', `./gulpfile.js`, themeAssetsFolder)
+			shell.cp('-R', `./gulpfile.js`, themeAssetsFolder)
 		}
 		if (fs.existsSync('./package.json')) {
-			shell.cp('-r', `./package.json`, themeAssetsFolder)
+			shell.cp('-R', `./package.json`, themeAssetsFolder)
 		}
 		// Rename info file to netothemeinfo.txt
 		shell.mv(`${themeTemplatesFolder}/${theme}-netothemeinfo.txt`, `${themeTemplatesFolder}/netothemeinfo.txt`)
