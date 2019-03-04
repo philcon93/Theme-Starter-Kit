@@ -80,32 +80,28 @@ function makeDir(options, callback){
 function copyFiles(options, callback){
 	log(warning("Copying the required files from Skeletal to our new theme."))
 	// Copy in required templates from Skeletal
-	shell.cp('-r', `${options.masterTheme}/${options.TEMPLATES}/headers/template.html`,`${options.dest}/${options.TEMPLATES}/headers/`)
-	shell.cp('-r', `${options.masterTheme}/${options.TEMPLATES}/footers/template.html`,`${options.dest}/${options.TEMPLATES}/footers/`)
-	shell.cp('-r', `${options.masterTheme}/${options.TEMPLATES}/cms/home.template.html`,`${options.dest}/${options.TEMPLATES}/cms/`)
-	shell.cp('-r', `${options.masterTheme}/${options.TEMPLATES}/skeletal-netothemeinfo.txt`,`${options.dest}/${options.TEMPLATES}/${options.name}-netothemeinfo.txt`)
+	shell.cp('-R', `${options.masterTheme}/${options.TEMPLATES}/headers/template.html`,`${options.dest}/${options.TEMPLATES}/headers/`)
+	shell.cp('-R', `${options.masterTheme}/${options.TEMPLATES}/footers/template.html`,`${options.dest}/${options.TEMPLATES}/footers/`)
+	shell.cp('-R', `${options.masterTheme}/${options.TEMPLATES}/cms/home.template.html`,`${options.dest}/${options.TEMPLATES}/cms/`)
+	shell.cp('-R', `${options.masterTheme}/${options.TEMPLATES}/skeletal-netothemeinfo.txt`,`${options.dest}/${options.TEMPLATES}/${options.name}-netothemeinfo.txt`)
 	if (fs.existsSync(`${options.masterTheme}/${options.LESS}`)) {
 		// Copy in less
-		shell.cp('-r', `${options.masterTheme}/${options.LESS}/_custom.less`,`${options.dest}/${options.LESS}/`)
-		shell.cp('-r', `${options.masterTheme}/${options.LESS}/_neto.less`,`${options.dest}/${options.LESS}/`)
-		shell.cp('-r', `${options.masterTheme}/${options.LESS}/_variables.less`,`${options.dest}/${options.LESS}/`)
-		shell.cp('-r', `${options.masterTheme}/${options.LESS}/app.less`,`${options.dest}/${options.LESS}/`)
+		shell.cp('-R', `${options.masterTheme}/${options.LESS}`,`${options.dest}/${options.CSS}/`)
 	}else if (fs.existsSync(`${options.masterTheme}/${options.SCSS}`)) {
 		// Copy in sass
-		shell.cp('-r', `${options.masterTheme}/${options.SCSS}/_custom.scss`,`${options.dest}/${options.SCSS}/`)
-		shell.cp('-r', `${options.masterTheme}/${options.SCSS}/_neto.scss`,`${options.dest}/${options.SCSS}/`)
-		shell.cp('-r', `${options.masterTheme}/${options.SCSS}/_bootstrap.scss`,`${options.dest}/${options.SCSS}/`)
-		shell.cp('-r', `${options.masterTheme}/${options.SCSS}/app.scss`,`${options.dest}/${options.SCSS}/`)
+		shell.cp('-R', `${options.masterTheme}/${options.SCSS}`,`${options.dest}/${options.src}/`)
 	}
 	// Copy in css
-	shell.cp('-r', `${options.masterTheme}/${options.CSS}/app.css`,`${options.dest}/${options.CSS}/`)
-	shell.cp('-r', `${options.masterTheme}/${options.CSS}/skeletal-style.css`,`${options.dest}/${options.CSS}/${options.dest}-style.css`)
+	if (fs.existsSync(`${options.masterTheme}/${options.CSS}/app.css`)) {
+		shell.cp('-R', `${options.masterTheme}/${options.CSS}/app.css`,`${options.dest}/${options.CSS}/`)
+	}
+	shell.cp('-R', `${options.masterTheme}/${options.CSS}/skeletal-style.css`,`${options.dest}/${options.CSS}/${options.dest}-style.css`)
 	// Copy other required files
-	shell.cp('-r', `${options.masterTheme}/.gitignore`,`${options.dest}/`)
-	shell.cp('-r', `${options.masterTheme}/gulpfile.js`,`${options.dest}/`)
-	shell.cp('-r', `${options.masterTheme}/package-lock.json`,`${options.dest}/`)
-	shell.cp('-r', `${options.masterTheme}/package.json`,`${options.dest}/`)
-	shell.cp('-r', `${options.masterTheme}/README.md`,`${options.dest}/`)
+	shell.cp('-R', `${options.masterTheme}/.gitignore`,`${options.dest}/`)
+	shell.cp('-R', `${options.masterTheme}/gulpfile.js`,`${options.dest}/`)
+	shell.cp('-R', `${options.masterTheme}/package-lock.json`,`${options.dest}/`)
+	shell.cp('-R', `${options.masterTheme}/package.json`,`${options.dest}/`)
+	shell.cp('-R', `${options.masterTheme}/README.md`,`${options.dest}/`)
 	log(success("👍 Copying done!"))
 	// Remove temp folder
 	shell.rm('-rf', options.tempFolder)
