@@ -13,7 +13,7 @@ ntheme lets you generate and compile Neto themes!
 - migrate|m [options]               Migrates a Neto theme so it can use the other Theme Starter Kit scripts based on a Skeletal branch
 ```
 
-Note that you need [Node.js](https://nodejs.org/en/) installed, and [gulp.js](http://gulpjs.com/) installed globally to run these script successfully.
+Note that you need [Node.js](https://nodejs.org/en/) installed, and [gulp.js](http://gulpjs.com/) installed globally to run these scripts successfully.
 
 ## Generate a theme
 
@@ -73,7 +73,11 @@ Ensure you have a stylesheet in `./css` called `THEME_NAME-style.css`. This file
 
 **-u**
 
-Compiles a theme as if it was installed from theme store, useful if you want to place your theme up via FTP. This can be useful for starting a theme, as you don't have to install Skeletal on your development site, then sync your theme on top of it. That workflow doesn't work if your master theme is a different branch to Skeletal master. It's useful while in development because the stylesheet will be renamed from `THEME_NAME-style.css` to `style.css`, which the header template is referencing. And finally it is useful because this compiled version is the outputted version merchants will get, so it will give you a better understanding of the final product.
+Compiles a theme as if it was installed from theme store, useful for the followings workflows:
+
+- If you want to place your theme up via FTP. This can be useful for starting a theme, as you don't have to install Skeletal on your development site, then sync your theme on top of it. That workflow doesn't work if your master theme is a different branch to Skeletal master. 
+- Useful while in development because the stylesheet will be renamed from `THEME_NAME-style.css` to `style.css`, which the header template is referencing. 
+- And useful because this compiled version is the outputted version Neto merchants will get, so it will give you a better understanding of the final product.
 
 ```
 ntheme compile -u
@@ -132,7 +136,7 @@ themeName
     ├── scss
     │   └── app.scss
     ├── css
-    │   └── THEMENAME-style.css
+    │   └── THEME_NAME-style.css
     └── templates
         ├── cms
         │   └── home.template.html
