@@ -13,7 +13,7 @@ ntheme lets you generate and compile Neto themes!
 - migrate|m [options]               Migrates a Neto theme so it can use the other Theme Starter Kit scripts based on a Skeletal branch
 ```
 
-Note that you need [Node.js](https://nodejs.org/en/) installed, and [gulp.js](http://gulpjs.com/) installed globally to run this script successfully.
+Note that you need [Node.js](https://nodejs.org/en/) installed, and [gulp.js](http://gulpjs.com/) installed globally to run these script successfully.
 
 ## Generate a theme
 
@@ -129,10 +129,10 @@ themeName
 ├── node_modules
 ├── package.json
 └── src
+    ├── scss
+    │   └── app.scss
     ├── css
-    │   ├── app.css
-    │   ├── app.less
-    │   └── mythemename-style.css
+    │   └── THEMENAME-style.css
     └── templates
         ├── cms
         │   └── home.template.html
@@ -152,13 +152,11 @@ You will need to configure your FTP application to upload your files without rem
 
 ## Compile your styles
 
-Any custom styles which you add to your theme should be done in `src/css/app.less`. This file can be compiled into `app.css` by running the `gulp` command in your theme:
+Any custom styles which you add to your theme should be done in `src/scss/app.scss`. This file can be compiled into `app.css` by running the `gulp` command in your theme:
 
 ```
 cd themeName
 gulp
 ```
 
-This will prompt gulp to watch any changes you make to `src/css/app.less` and automatically compile them. You can add in new build task in the `gulpfile.js`.
-
-**Note:** Skeletal Bootstrap 4 uses SASS instead of LESS as a style preprocessor and is located `src/scss/app.scss`, but the gulp script is the exact same to compile.
+This will prompt gulp to watch any changes you make to `src/scss/app.scss` and automatically compile them. You can add in new build task in the `gulpfile.js`.
