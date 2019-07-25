@@ -27,7 +27,7 @@ module.exports.generate = (name, branch) => {
 	branch ? options.branch = branch : options.branch = undefined
 	options.generatedThemeName = 'Skeletal'
 	options.generatedThemeOwner = 'NetoECommerce'
-	options.generatedThemeGit = `git://github.com/${options.generatedThemeOwner}/${options.generatedThemeName}.git`
+	options.generatedThemeGit = `git+https://github.com/${options.generatedThemeOwner}/${options.generatedThemeName}.git`
 	// Remove dist and temp directories
 	shell.rm('-rf', options.dest)
 	shell.mkdir('-p', options.dest)
