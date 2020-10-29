@@ -21,6 +21,7 @@ module.exports.compile = (opt) => {
 	options.CSS = `${options.src}/css`
 	options.LESS = `${options.CSS}/less`
 	options.SCSS = `${options.src}/scss`
+	options.FONTS = `${options.src}/fonts`
 	options.JS = `${options.src}/js`
 	options.IMG = `${options.src}/img`
 	if (fs.existsSync('./package.json')) {
@@ -118,6 +119,9 @@ function zipThemes(options, callback){
 		}
 		if (fs.existsSync(`./${options.SCSS}`)) {
 			shell.cp('-R', `./${options.SCSS}`, themeAssetsFolder)
+		}
+		if (fs.existsSync(`./${options.FONTS}`)) {
+			shell.cp('-R', `./${options.FONTS}`, themeAssetsFolder)
 		}
 		if (fs.existsSync(`./${options.JS}`)) {
 			shell.cp('-R', `./${options.JS}`, themeAssetsFolder)
